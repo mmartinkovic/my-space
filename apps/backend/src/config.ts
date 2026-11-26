@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { backendRoles, backendRolesSchema, cidrListSchema } from './roles.ts';
 
 const nodeEnvs = ['development', 'test', 'production'] as const;
 const logLevels = ['trace', 'debug', 'info', 'warn', 'error'] as const;
@@ -42,13 +43,29 @@ const envSchema = z
         )
         .default(4000),
     ),
+    BACKEND_ROLES: z.preprocess(
+      emptyToUndefined,
+      z.string().default(backendRoles.join(',')).pipe(backendRolesSchema),
+    ),
+    TRUST_PROXY_CIDRS: z.preprocess(emptyToUndefined, z.string().default('').pipe(cidrListSchema)),
   })
   .transform((env) => ({
     nodeEnv: env.NODE_ENV,
     logLevel: env.LOG_LEVEL,
     backendHost: env.BACKEND_HOST,
     backendPort: env.BACKEND_PORT,
+    backendRoles: env.BACKEND_ROLES,
+    trustProxyCidrs: env.TRUST_PROXY_CIDRS,
   }));
+
+/**
+ * Human-readable rule per variable for issues raised inside nested schemas (list items, pipes),
+ * so the message never depends on (or echoes) the received value.
+ */
+const nestedRuleMessages: Readonly<Partial<Record<string, string>>> = {
+  BACKEND_ROLES: `must be a comma-separated list of: ${backendRoles.join(', ')}`,
+  TRUST_PROXY_CIDRS: 'must be a comma-separated list of CIDRs, e.g. 172.18.0.0/16 (empty = none)',
+};
 
 export type Config = z.output<typeof envSchema>;
 
@@ -67,13 +84,17 @@ export const loadConfig = (env: Readonly<Record<string, string | undefined>>): C
   if (parsed.success) {
     return { ok: true, config: parsed.data };
   }
-  return {
-    ok: false,
-    issues: parsed.error.issues.map((issue) => ({
-      variable: issue.path.map(String).join('.'),
-      message: issue.message,
-    })),
-  };
+  const issues = parsed.error.issues.map((issue): ConfigIssue => {
+    const variable = String(issue.path[0] ?? '');
+    return { variable, message: nestedRuleMessages[variable] ?? issue.message };
+  });
+  const unique = issues.filter(
+    (issue, index) =>
+      issues.findIndex(
+        (other) => other.variable === issue.variable && other.message === issue.message,
+      ) === index,
+  );
+  return { ok: false, issues: unique };
 };
 
 export const formatConfigIssues = (issues: readonly ConfigIssue[]): string =>
