@@ -96,10 +96,11 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 - **Ctx:** DEPLOYMENT.md §6. **Deps:** P0-01d
 
 ### P0-03 Backend skeleton
-#### [ ] P0-03a Config & logger
+#### [x] P0-03a Config & logger
 - **Files:** `apps/backend/src/{config.ts,logger.ts,main.ts}`, tests
 - **Do:** zod-validated env (process exits with a readable list of missing/invalid vars); pino JSON logger with the `redact` list.
 - **Done:** tests: missing var → readable error; redacted keys never appear in log output.
+- **Notes (done 2026-11-26):** `loadConfig(env)` returns a `ConfigResult` union; issues contain variable + rule only (never values); empty values count as missing. Variables so far: `NODE_ENV` (required), `LOG_LEVEL`, `BACKEND_HOST`, `BACKEND_PORT` (defaults) — later subtasks add theirs (`BACKEND_ROLES`/`TRUST_PROXY_CIDRS` in P0-03c, `DATABASE_URL` in P0-04a, …). `.env` loaded with Node's `--env-file-if-exists` in `dev` (no dotenv dependency); production env comes from Compose. Logger: pino `redact` paths + request serializer masking iCal path tokens and `token` query params (`maskUrl`). Backend now has a `test` script; `core-nettools` dependency dropped (wiring proof no longer needed).
 - **Ctx:** `.env.example`, SECURITY.md §2 (I2), §7. **Deps:** P0-01d
 
 #### [ ] P0-03b Errors & validation
