@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { formatConfigIssues, loadConfig } from './config.ts';
 
-const validEnv = { NODE_ENV: 'development' };
+const databaseUrl = 'postgres://projectu:dev-password@127.0.0.1:5432/projectu';
+const validEnv = { NODE_ENV: 'development', DATABASE_URL: databaseUrl };
 
 describe('loadConfig', () => {
   it('applies defaults for optional variables', () => {
@@ -14,6 +15,7 @@ describe('loadConfig', () => {
         backendPort: 4000,
         backendRoles: ['api', 'worker'],
         trustProxyCidrs: [],
+        databaseUrl,
       },
     });
   });
@@ -27,6 +29,7 @@ describe('loadConfig', () => {
         BACKEND_PORT: '4100',
         BACKEND_ROLES: 'worker',
         TRUST_PROXY_CIDRS: '172.18.0.0/16',
+        DATABASE_URL: 'postgresql://app:secret@postgres:5432/projectu',
       }),
     ).toEqual({
       ok: true,
@@ -37,14 +40,30 @@ describe('loadConfig', () => {
         backendPort: 4100,
         backendRoles: ['worker'],
         trustProxyCidrs: ['172.18.0.0/16'],
+        databaseUrl: 'postgresql://app:secret@postgres:5432/projectu',
       },
     });
   });
 
   it.each([
-    [{}, 'NODE_ENV', 'is required'],
-    [{ NODE_ENV: '' }, 'NODE_ENV', 'is required'],
-    [{ NODE_ENV: 'staging' }, 'NODE_ENV', 'must be one of: development, test, production'],
+    [{ DATABASE_URL: databaseUrl }, 'NODE_ENV', 'is required'],
+    [{ ...validEnv, NODE_ENV: '' }, 'NODE_ENV', 'is required'],
+    [
+      { ...validEnv, NODE_ENV: 'staging' },
+      'NODE_ENV',
+      'must be one of: development, test, production',
+    ],
+    [{ NODE_ENV: 'development' }, 'DATABASE_URL', 'is required'],
+    [
+      { ...validEnv, DATABASE_URL: 'mysql://u:p@db/projectu' },
+      'DATABASE_URL',
+      'must be a postgres:// URL, e.g. postgres://projectu:<password>@127.0.0.1:5432/projectu',
+    ],
+    [
+      { ...validEnv, DATABASE_URL: 'projectu' },
+      'DATABASE_URL',
+      'must be a postgres:// URL, e.g. postgres://projectu:<password>@127.0.0.1:5432/projectu',
+    ],
     [
       { ...validEnv, LOG_LEVEL: 'verbose' },
       'LOG_LEVEL',
@@ -90,12 +109,17 @@ describe('loadConfig', () => {
     expect(result.ok ? [] : result.issues.map((issue) => issue.variable)).toEqual([
       'NODE_ENV',
       'BACKEND_PORT',
+      'DATABASE_URL',
     ]);
   });
 
   it('never echoes received values in issues', () => {
     const secretLike = 'p4ssw0rd-should-not-appear';
-    const result = loadConfig({ NODE_ENV: secretLike, BACKEND_PORT: secretLike });
+    const result = loadConfig({
+      NODE_ENV: secretLike,
+      BACKEND_PORT: secretLike,
+      DATABASE_URL: `mysql://u:${secretLike}@db/x`,
+    });
     expect(JSON.stringify(result)).not.toContain(secretLike);
   });
 });

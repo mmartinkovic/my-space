@@ -43,11 +43,14 @@ pnpm dev                      # web on http://localhost:3000, backend on http://
 ```
 The backend validates its environment at startup and exits with a list of missing/invalid variables (names and rules only, never values). Variables are added to `apps/backend/src/config.ts` by the subtask that first uses them.
 
-From P0-04 on (database):
+Database (from P0-04a; Docker Desktop must be running):
 ```bash
-docker compose -f compose.dev.yaml up -d postgres
-pnpm --filter @projectu/backend db:migrate
+# in .env: POSTGRES_PASSWORD=<random>, DATABASE_URL=postgres://projectu:<same password>@127.0.0.1:5432/projectu
+docker compose -f compose.dev.yaml up -d --wait postgres    # PostgreSQL 18, bound to 127.0.0.1 only
+pnpm --filter @projectu/backend db:migrate                  # applies migrations (fails fast on wrong credentials)
+pnpm --filter @projectu/backend db:generate                 # after schema changes: writes a reviewed SQL migration
 ```
+`DATABASE_URL` is required by the backend from P0-04a on. The dev volume keeps the password it was first created with; to change it, remove the volume (`docker compose -f compose.dev.yaml down -v`).
 Quality gates:
 ```bash
 pnpm typecheck && pnpm lint && pnpm test && pnpm format:check

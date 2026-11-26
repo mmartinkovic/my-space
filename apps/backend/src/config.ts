@@ -48,6 +48,15 @@ const envSchema = z
       z.string().default(backendRoles.join(',')).pipe(backendRolesSchema),
     ),
     TRUST_PROXY_CIDRS: z.preprocess(emptyToUndefined, z.string().default('').pipe(cidrListSchema)),
+    DATABASE_URL: z.preprocess(
+      emptyToUndefined,
+      z.url({
+        protocol: /^postgres(ql)?$/,
+        error: ruleMessage(
+          'must be a postgres:// URL, e.g. postgres://projectu:<password>@127.0.0.1:5432/projectu',
+        ),
+      }),
+    ),
   })
   .transform((env) => ({
     nodeEnv: env.NODE_ENV,
@@ -56,6 +65,7 @@ const envSchema = z
     backendPort: env.BACKEND_PORT,
     backendRoles: env.BACKEND_ROLES,
     trustProxyCidrs: env.TRUST_PROXY_CIDRS,
+    databaseUrl: env.DATABASE_URL,
   }));
 
 /**
