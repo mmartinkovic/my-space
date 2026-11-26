@@ -34,7 +34,7 @@ packages/core-api-client typed fetch client over core-schemas
 | Typecheck | `pnpm typecheck` |
 | Lint / format | `pnpm lint` / `pnpm format` (check only: `pnpm format:check`) |
 | Unit tests | `pnpm test` (single package: `pnpm --filter @projectu/<pkg> test`) |
-| Integration tests | `pnpm test:integration` (needs Docker) — P0-04b |
+| Integration tests | `pnpm test:integration` (needs Docker Desktop running) — files `*.int.test.ts`, DB via `createTestDatabase()` from `apps/backend/test/db.ts` |
 | Backend CLI | `node src/cli.ts <command>` in `apps/backend` (in production: `docker compose run --rm backend node src/cli.ts <command>`); commands so far: `db:migrate` |
 | DB generate migration | `pnpm --filter @projectu/backend db:generate` |
 | DB migrate | `pnpm --filter @projectu/backend db:migrate` |

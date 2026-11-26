@@ -8,7 +8,13 @@ import { runMigrations } from './db/migrate.ts';
  */
 const commands = {
   'db:migrate': async (databaseUrl: string): Promise<string> => {
-    const database = createDatabase({ url: databaseUrl, maxConnections: 1 });
+    const database = createDatabase({
+      url: databaseUrl,
+      maxConnections: 1,
+      onPoolError: (error) => {
+        process.stderr.write(`database connection error: ${error.message}\n`);
+      },
+    });
     try {
       // Fail fast on wrong credentials/host even when there is nothing to migrate (deploy.sh relies on it).
       await database.pool.query('select 1');

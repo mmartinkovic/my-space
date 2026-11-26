@@ -51,6 +51,9 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Integration tests (PostgreSQL via Testcontainers)
+        run: pnpm test:integration
+
       - name: Build
         run: pnpm build
 

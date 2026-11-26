@@ -1,5 +1,7 @@
 import { buildApp } from './app.ts';
 import { formatConfigIssues, loadConfig } from './config.ts';
+import { createDatabase } from './db/client.ts';
+import { databaseReadinessCheck } from './db/readiness.ts';
 import { createLoggerOptions } from './logger.ts';
 import { createShutdownHandler } from './shutdown.ts';
 
@@ -12,11 +14,20 @@ if (!result.ok) {
 }
 const { config } = result;
 
+const database = createDatabase({
+  url: config.databaseUrl,
+  maxConnections: 5,
+  onPoolError: (error) => {
+    app.log.error({ err: error }, 'idle database client failed');
+  },
+});
+
 const app = buildApp({
   logger: createLoggerOptions(config),
   trustProxyCidrs: config.trustProxyCidrs,
-  readinessChecks: [],
+  readinessChecks: [databaseReadinessCheck(database.pool)],
 });
+app.addHook('onClose', () => database.close());
 
 const shutdown = createShutdownHandler({
   close: () => app.close(),
