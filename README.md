@@ -104,5 +104,13 @@ If push notifications stop arriving (iOS may drop the subscription for rarely op
 ## Data sources & attribution
 Weather data by [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0) · Football data provided by [football-data.org](https://www.football-data.org/) · F1 data by [Jolpica F1](https://github.com/jolpica/jolpica-f1) (CC BY-NC-SA 4.0) and [OpenF1](https://openf1.org/) (CC BY-NC-SA 4.0). Personal, non-commercial use only. Details: [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md).
 
+## CI and branch protection
+Every push to `main` and every pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml): frozen install → format check → typecheck → lint → unit tests → build → `pnpm audit --prod --audit-level high`. Actions are pinned to commit SHAs; Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) proposes weekly grouped updates for npm and GitHub Actions (Docker is added with the Dockerfiles in P0-10a).
+
+Branch protection for `main` (repository ruleset, one-time setup by the owner):
+- Settings → Rules → Rulesets → New branch ruleset, target `main` (default branch), enforcement **Active**.
+- Enable **Require a pull request before merging** (0 approvals — single maintainer), **Require status checks to pass** with the check `verify`, **Block force pushes**, **Restrict deletions**.
+- Merges use **Squash and merge**; the branch is deleted after merge.
+
 ## Security
 Threat model, auth design and operational rules: [docs/SECURITY.md](docs/SECURITY.md).

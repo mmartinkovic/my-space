@@ -88,10 +88,11 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 - **Ctx:** ADR 0001, ADR 0009, README "Local development". **Deps:** P0-01c
 
 ### P0-02 CI and dependency hygiene
-#### [ ] P0-02 CI workflow, Dependabot, branch protection
+#### [x] P0-02 CI workflow, Dependabot, branch protection
 - **Files:** `.github/workflows/ci.yml`, `.github/dependabot.yml`, `README.md`
 - **Do:** CI on push/PR: install (pnpm cache) → typecheck → lint → test → build on Node 26; `pnpm audit --prod` (fail on high/critical). Dependabot weekly for npm, GitHub Actions, Docker. Document branch protection on `main` (required CI check) in README.
 - **Done:** CI green on this PR; branch protection enabled by the owner.
+- **Notes (done 2026-11-26):** single job `verify` (also the required status check); actions pinned to commit SHAs (checkout v7.0.1, pnpm/action-setup v6.1.1, setup-node v7.1.0); pnpm version from `packageManager`, Node from `.nvmrc`; `format:check` added to the pipeline; Next/Turbo telemetry off in CI. Dependabot: npm + github-actions, grouped, relying on its documented default 3-day cooldown; the Docker ecosystem is added in P0-10a (no Dockerfiles yet). `test:integration` joins CI in P0-04b.
 - **Ctx:** DEPLOYMENT.md §6. **Deps:** P0-01d
 
 ### P0-03 Backend skeleton
@@ -121,7 +122,7 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 - **Ctx:** ADR 0002, ADR 0003, DATA-MODEL.md "Conventions". **Deps:** P0-03c
 
 #### [ ] P0-04b Integration test harness
-- **Files:** `apps/backend/test/{db.ts,setup-integration.ts}`, `apps/backend/vitest.integration.config.ts`, readiness DB check
+- **Files:** `apps/backend/test/{db.ts,setup-integration.ts}`, `apps/backend/vitest.integration.config.ts`, readiness DB check, `.github/workflows/ci.yml` (add `pnpm test:integration` step)
 - **Do:** Testcontainers helper: fresh PostgreSQL per test file with migrations applied; `test:integration` script; `/api/health/ready` checks the DB.
 - **Done:** integration test: ready → 200 with DB, 503 when the DB is unreachable.
 - **Ctx:** CLAUDE.md "Testing". **Deps:** P0-04a
@@ -259,7 +260,7 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 
 ### P0-10 Containers, compose, first deploy
 #### [ ] P0-10a Dockerfiles
-- **Files:** `apps/backend/Dockerfile`, `apps/web/Dockerfile`, `.dockerignore`
+- **Files:** `apps/backend/Dockerfile`, `apps/web/Dockerfile`, `.dockerignore`, `.github/dependabot.yml` (add the `docker` ecosystem)
 - **Do:** multi-stage, non-root, pnpm pinned, Next.js standalone output; image label with the git SHA.
 - **Done:** both images build locally; containers start and answer health / home page.
 - **Ctx:** DEPLOYMENT.md §4. **Deps:** P0-08b, P0-09c
