@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+node_modules/
+dist/
+build/
+.next/
+out/
+.turbo/
+coverage/
+# Hand-formatted docs (tables); not reformatted by tooling
+*.md
