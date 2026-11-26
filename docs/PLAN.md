@@ -141,10 +141,11 @@ Test instructions always name the exact branch: before the PR is merged they sta
 - **Ctx:** DATA-MODEL.md "Conventions", "Enums", "Settings & auth". **Deps:** P0-04b
 
 ### P0-05 Shared foundations
-#### [ ] P0-05a `core-i18n` dictionaries & formatters
+#### [x] P0-05a `core-i18n` dictionaries & formatters
 - **Files:** `packages/core-i18n/src/**`
 - **Do:** `sk` source dictionary, `en` typed via `satisfies` (missing key = type error); parameterised messages; formatters: date/time in zone, relative time, EUR, numbers.
 - **Done:** plural tests (sk 1 / 2–4 / 5+), formatter tests with explicit zone.
+- **Notes (done 2026-11-26):** `getDictionary(locale)` + `Dictionary` type (shape of `sk.ts`); first messages are `nav.*` (for P0-07a) and `duration.{days,hours,minutes}({ count })`. Later modules add their strings to `sk.ts` and `en.ts`. Formatters: `formatDate` / `formatTime` / `formatDateTime` (`timeZone` required), `formatRelativeTime` (`now` passed in), `formatNumber`, `formatEuro({ cents })` — `cents` is a plain `number` until a `Cents` brand exists. Behaviour choices are recorded in ADR 0008 "Assumptions".
 - **Ctx:** ADR 0008. **Deps:** P0-01c
 
 #### [ ] P0-05b `core-domain/time`
