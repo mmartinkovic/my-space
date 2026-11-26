@@ -148,9 +148,9 @@ Test instructions always name the exact branch: before the PR is merged they sta
 - **Notes (done 2026-11-26):** `getDictionary(locale)` + `Dictionary` type (shape of `sk.ts`); first messages are `nav.*` (for P0-07a) and `duration.{days,hours,minutes}({ count })`. Later modules add their strings to `sk.ts` and `en.ts`. Formatters: `formatDate` / `formatTime` / `formatDateTime` (`timeZone` required), `formatRelativeTime` (`now` passed in), `formatNumber`, `formatEuro({ cents })` — `cents` is a plain `number` until a `Cents` brand exists. Behaviour choices are recorded in ADR 0008 "Assumptions".
 - **Ctx:** ADR 0008. **Deps:** P0-01c
 
-#### [ ] P0-05b `core-domain/time`
+#### [x] P0-05b `core-domain/time`
 - **Files:** `packages/core-domain/src/time/**`
-- **Do:** `toUtcInstant({ localDate, localTime, zone })`, `startOfLocalDay`, `startOfLocalMonth` with `date-fns` + `@date-fns/tz`.
+- **Do:** `toUtcInstant({ localDate, localTime, zone })`, `startOfLocalDay`, `startOfLocalMonth` with `@date-fns/tz` (ADR 0011).
 - **Done:** DST tests (2027-03-28, 2027-10-31 and current-year equivalents); non-existent/ambiguous local times documented and tested.
 - **Ctx:** ADR 0011. **Deps:** P0-01c
 
