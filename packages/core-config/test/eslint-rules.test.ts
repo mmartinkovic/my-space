@@ -11,8 +11,14 @@ const eslint = new ESLint({
   overrideConfig: createEslintConfig({ rootDir: fixturesDir }),
 });
 
-const ruleIdsFor = async (fixture: string): Promise<string[]> => {
-  const [result] = await eslint.lintFiles([path.join(fixturesDir, fixture)]);
+const universalEslint = new ESLint({
+  cwd: fixturesDir,
+  overrideConfigFile: true,
+  overrideConfig: createEslintConfig({ rootDir: fixturesDir, universal: true }),
+});
+
+const ruleIdsFor = async (fixture: string, linter: ESLint = eslint): Promise<string[]> => {
+  const [result] = await linter.lintFiles([path.join(fixturesDir, fixture)]);
   if (result === undefined) {
     throw new Error(`No lint result for ${fixture}`);
   }
@@ -40,5 +46,22 @@ describe('shared ESLint config', () => {
 
   it('allows default exports in Next.js special files', async () => {
     expect(await ruleIdsFor('app/page.ts')).toEqual([]);
+  });
+
+  it.each([
+    ['uses-node-import.ts', 'no-restricted-imports'],
+    ['uses-node-global.ts', 'no-restricted-globals'],
+  ])('universal mode rejects %s via %s', async (fixture, ruleId) => {
+    expect(await ruleIdsFor(fixture, universalEslint)).toContain(ruleId);
+  });
+
+  it('allows Node imports when universal mode is off', async () => {
+    expect(await ruleIdsFor('uses-node-import.ts')).not.toContain('no-restricted-imports');
+  });
+
+  it('still forbids deep imports in universal mode', async () => {
+    expect(await ruleIdsFor('bad-deep-import.ts', universalEslint)).toContain(
+      'no-restricted-imports',
+    );
   });
 });
