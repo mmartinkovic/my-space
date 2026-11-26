@@ -20,7 +20,8 @@ packages/core-i18n       sk/en dictionaries + Intl formatters
 packages/core-api-client typed fetch client over core-schemas
 ```
 - Dependency direction: `apps/* → (future feature-*/platform-*) → core-*`. `core-*` never imports apps, React, DOM or `node:*` APIs (must run in browser, Node and React Native).
-- Import packages only by name (`@projectu/core-domain`), never deep paths. Named exports only (Next.js special files are the only default-export exception).
+- Import packages only by name (`@projectu/core-domain`), never deep paths. Named exports only (Next.js special files and `*.config.*` files are the only default-export exceptions). Relative imports carry the `.ts` extension (`./locale.ts`).
+- Runtime `core-*` packages lint with `createEslintConfig({ rootDir, universal: true })`, which blocks Node imports and globals.
 - Only `apps/backend` touches the database or keyed external APIs. Business rules live in `core-domain`, not in route handlers or React components.
 
 ## Commands *(to be confirmed in P0-01d — update this section then)*

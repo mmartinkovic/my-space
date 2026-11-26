@@ -60,10 +60,11 @@ The plan is split into **small, self-contained subtasks** (IDs like `P0-06c`) so
 - **Notes (done 2026-11-26):** exports `@projectu/core-config/eslint` (`createEslintConfig({ rootDir, ignores })`, based on `strictTypeChecked`), `/vitest` (`vitestPreset`), `/tsconfig/*.json`. Extra rules from CLAUDE.md: no `enum`, `type` over `interface`, type-only imports, no `console`. TypeScript pinned to **6.0.3** (typescript-eslint 8.74 supports `<6.1`; TS 7 later). Root dev tools: `typescript`, `eslint`, `vitest`, `vite` (required peer of Vitest). pnpm 11 rejects releases younger than its minimum release age — versions were pinned to the previous release (`vite` 8.3.8, `@types/node` 26.6.10) instead of adding exclusions.
 - **Ctx:** CLAUDE.md "Coding conventions", ADR 0001 "Rules". **Deps:** P0-01a
 
-#### [ ] P0-01c Core package skeletons
-- **Files:** `packages/core-{schemas,domain,nettools,i18n,api-client}/{package.json,tsconfig.json,src/index.ts,src/index.test.ts}`
+#### [x] P0-01c Core package skeletons
+- **Files:** `packages/core-{schemas,domain,nettools,i18n,api-client}/{package.json,tsconfig.json,eslint.config.js,vitest.config.ts,src/index.ts,src/index.test.ts}`, `packages/core-config/{eslint,tsconfig,test}/**`
 - **Do:** one entry point each (`exports: { ".": "./src/index.ts" }`), named exports, one sample unit test per package.
 - **Done:** `pnpm test` runs 5 green tests; a deep import of a package is a lint error.
+- **Notes (done 2026-11-26):** each package ships one small real export instead of a dummy: `localeSchema`/`Locale` (schemas, adds `zod`), `defaultLocale` (i18n, depends on schemas), `assertNever` (domain), `isIpv4Address` (nettools), `joinUrl` (api-client). `core-config` gained: `universal: true` option (forbids `node:*` imports and Node globals in runtime `core-*` code), a tooling tsconfig used by ESLint for root `*.config.*` files (Node types stay out of `src`), `no-undef` off (TypeScript reports it), and `.ts` extensions in relative imports (`allowImportingTsExtensions` + `rewriteRelativeImportExtensions`).
 - **Ctx:** ADR 0001. **Deps:** P0-01b
 
 #### [ ] P0-01d App skeletons + confirmed commands

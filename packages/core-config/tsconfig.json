@@ -4,6 +4,6 @@
     "allowJs": true,
     "checkJs": true
   },
-  "include": ["eslint", "vitest", "test", "*.js", "*.ts"],
+  "include": ["eslint", "vitest", "test"],
   "exclude": ["test/fixtures"]
 }
