@@ -17,6 +17,7 @@ The plan is split into **small, self-contained subtasks** (IDs like `P0-06c`) so
 
 ## Test checkpoints (owner)
 At the end of each subtask below, the agent tells the owner exactly how to try it out.
+Test instructions always name the exact branch: before the PR is merged they start with `git switch <feature-branch>`; "on `main` after `git pull`" is written only once the PR is actually merged (check `gh pr view <n> --json state`).
 
 | After | What the owner can try | Where |
 |---|---|---|
