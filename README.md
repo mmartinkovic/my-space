@@ -34,20 +34,25 @@ docs/               plan, architecture, data model, sources, security, deploymen
 ops/                deploy, backup and restore scripts (Phase 0)
 ```
 
-## Local development *(Phase 0)*
-Prerequisites: Node.js 26 LTS, pnpm 11, Docker (for PostgreSQL and integration tests).
+## Local development
+Prerequisites: Node.js 26.1+ (see `.nvmrc`), pnpm 11 (`npm i -g pnpm@11`), Docker (for PostgreSQL and integration tests, from P0-04).
 ```bash
 pnpm install
+pnpm dev                      # web on http://localhost:3000, backend on http://localhost:4000
+```
+From P0-04 on (database):
+```bash
 cp .env.example .env          # fill in values; NODE_ENV=development
 docker compose -f compose.dev.yaml up -d postgres
 pnpm --filter @projectu/backend db:migrate
-pnpm dev                      # web on http://localhost:3000, backend on http://localhost:4000
 ```
 Quality gates:
 ```bash
-pnpm typecheck && pnpm lint && pnpm test
-pnpm test:integration         # backend tests against a real PostgreSQL (Testcontainers)
+pnpm typecheck && pnpm lint && pnpm test && pnpm format:check
+pnpm build                    # Next.js production build (the backend has no build step)
+pnpm test:integration         # backend tests against a real PostgreSQL (Testcontainers), from P0-04b
 ```
+The backend runs its TypeScript sources directly on Node 26 (type stripping), so only erasable TypeScript syntax is allowed (`erasableSyntaxOnly`) and relative imports use `.ts` extensions.
 Passkeys require a secure context: `localhost` works for development; for testing on the iPhone use the deployed HTTPS instance.
 
 ## Environment variables
@@ -56,7 +61,7 @@ All variables are documented in [.env.example](.env.example) and validated at ba
 | Group | Variables |
 |---|---|
 | General | `NODE_ENV`, `APP_ORIGIN`, `APP_DOMAIN`, `APP_TIMEZONE`, `LOG_LEVEL` |
-| Backend | `BACKEND_PORT`, `BACKEND_ROLES`, `TRUST_PROXY_CIDRS` |
+| Backend | `BACKEND_HOST`, `BACKEND_PORT`, `BACKEND_ROLES`, `TRUST_PROXY_CIDRS` |
 | Database | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `DATABASE_URL` |
 | Auth | `WEBAUTHN_RP_ID`, `WEBAUTHN_RP_NAME`, `SETUP_TOKEN` (setup only) |
 | Web Push | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` |
@@ -71,7 +76,7 @@ First deployment checklist:
 1. Router: forward TCP 80 and 443 to the server; DNS A record → public IP.
 2. `cp .env.example .env`, fill in, `chmod 600 .env`.
 3. `./ops/deploy.sh`
-4. Generate VAPID keys (`docker compose run --rm backend node dist/cli.js vapid:generate`), put them in `.env`, redeploy.
+4. Generate VAPID keys (`docker compose run --rm backend node src/cli.ts vapid:generate`), put them in `.env`, redeploy.
 5. Open `https://<your-domain>/setup`, register your passkey with `SETUP_TOKEN`, save the recovery codes in your password manager, register a second passkey (laptop), then delete `SETUP_TOKEN` from `.env` and redeploy.
 
 ## iPhone installation
@@ -92,8 +97,8 @@ If push notifications stop arriving (iOS may drop the subscription for rarely op
 ## Telegram bot setup
 1. In Telegram, talk to **@BotFather** → `/newbot` → copy the token into `TELEGRAM_BOT_TOKEN`.
 2. Generate `TELEGRAM_WEBHOOK_SECRET` (`openssl rand -hex 32`).
-3. Send `/start` to your bot, then run `docker compose run --rm backend node dist/cli.js telegram:whoami` and put the printed chat id into `TELEGRAM_ALLOWED_CHAT_ID`.
-4. Run `docker compose run --rm backend node dist/cli.js telegram:set-webhook`.
+3. Send `/start` to your bot, then run `docker compose run --rm backend node src/cli.ts telegram:whoami` and put the printed chat id into `TELEGRAM_ALLOWED_CHAT_ID`.
+4. Run `docker compose run --rm backend node src/cli.ts telegram:set-webhook`.
 5. Send `/help` to the bot.
 
 ## Data sources & attribution

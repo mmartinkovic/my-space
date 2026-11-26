@@ -1,0 +1,20 @@
+{
+  "name": "@projectu/backend",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/main.ts",
+    "start": "node src/main.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@projectu/core-nettools": "workspace:*",
+    "fastify": "5.12.8"
+  },
+  "devDependencies": {
+    "@projectu/core-config": "workspace:*",
+    "@types/node": "26.6.10"
+  }
+}

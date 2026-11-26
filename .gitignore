@@ -27,3 +27,7 @@ Thumbs.db
 *.dump
 *.dump.age
 age-key*.txt
+
+# Generated TypeScript files
+next-env.d.ts
+*.tsbuildinfo

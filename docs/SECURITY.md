@@ -39,7 +39,7 @@ See [ADR 0005](decisions/0005-auth-passkeys.md). Flows:
 2. **Login**: `POST /api/auth/login/options` (discoverable credentials, no username) → `POST /api/auth/login/verify` → new session (old session rotated).
 3. **Step-up**: same assertion flow with existing session → `elevated_until = now + 10 min`.
 4. **Recovery**: `POST /api/auth/recovery` with a code → `recovery` session (15 min) → register new passkey → full session; Telegram alert.
-5. **Lockout last resort**: on the server, `docker compose run --rm backend node dist/cli.js auth:reset` deletes all credentials and recovery codes and prints a one-time `SETUP_TOKEN`-equivalent valid 15 min. Requires physical/SSH access.
+5. **Lockout last resort**: on the server, `docker compose run --rm backend node src/cli.ts auth:reset` deletes all credentials and recovery codes and prints a one-time `SETUP_TOKEN`-equivalent valid 15 min. Requires physical/SSH access.
 6. **Logout**: deletes session row; "log out everywhere" deletes all sessions.
 
 Challenges are single-use, 5-minute TTL, stored server-side. `expectedOrigin = APP_ORIGIN`, `expectedRPID = WEBAUTHN_RP_ID`. Sign counter checked (0 allowed for synced passkeys per spec).

@@ -1,0 +1,4 @@
+{
+  "extends": "@projectu/core-config/tsconfig/node.json",
+  "include": ["src"]
+}
