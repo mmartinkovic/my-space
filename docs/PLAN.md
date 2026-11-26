@@ -47,9 +47,9 @@ The plan is split into **small, self-contained subtasks** (IDs like `P0-06c`) so
 ## Phase 0 — Foundation
 
 ### P0-01 Monorepo bootstrap
-#### [ ] P0-01a Workspace root
-- **Files:** `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.nvmrc`, `.npmrc`, `.prettierrc.json`, `.prettierignore`, `.editorconfig`
-- **Do:** Node 26 pinned (`.nvmrc`, `engines`), pnpm 11 pinned (`packageManager`), lockfile committed; turbo tasks `dev`, `build`, `typecheck`, `lint`, `format`, `test`, `test:integration`.
+#### [x] P0-01a Workspace root
+- **Files:** `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `turbo.json`, `.nvmrc`, `.prettierrc.json`, `.prettierignore`, `.editorconfig`, `.gitattributes`
+- **Do:** Node 26 pinned (`.nvmrc`, `engines`), pnpm 11 pinned (`packageManager`), lockfile committed; turbo tasks `dev`, `build`, `typecheck`, `lint`, `test`, `test:integration`; `format` / `format:check` run Prettier at the root. pnpm settings (`engineStrict`) live in `pnpm-workspace.yaml` (no `.npmrc`). `.gitattributes` forces LF (`* text=auto eol=lf`) so shell scripts and Docker builds work from a Windows checkout. Markdown docs are excluded from Prettier (hand-formatted tables).
 - **Done:** `pnpm install` succeeds; `pnpm typecheck`, `pnpm lint`, `pnpm test` run (no-op) without error.
 - **Ctx:** ADR 0001, ADR 0009. **Deps:** —
 
