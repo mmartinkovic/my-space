@@ -3,7 +3,3 @@ packages:
   - packages/*
 
 engineStrict: true
-
-minimumReleaseAgeExclude:
-  - '@types/node@26.6.11'
-  - vite@8.4.0
