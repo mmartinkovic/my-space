@@ -173,7 +173,7 @@ Visible iff event finished AND (event not followed OR spoiler off for sport OR w
 
 ## 8. Error handling
 
-- Typed errors: `AppError` discriminated union (`kind: 'not-found' | 'validation' | 'unauthorized' | 'forbidden' | 'conflict' | 'rate-limited' | 'upstream-unavailable'`) mapped to HTTP status in one Fastify error handler; response body `{ error: { code, message } }` without stack traces.
+- Typed errors: `AppError` discriminated union (`kind: 'not-found' | 'validation' | 'unauthorized' | 'forbidden' | 'conflict' | 'rate-limited' | 'upstream-unavailable'`) mapped to HTTP status in one Fastify error handler; response body `{ error: { code, message, issues? } }` (`errorResponseSchema` in `core-schemas`) without stack traces. `code` defaults to the kind (`not-found`, `validation`, …) or a specific code (`last-passkey`); framework client errors map to `bad-request`, `payload-too-large`, `unsupported-media-type`; everything unexpected becomes `internal` (500) and is logged with details.
 - Every `catch` either handles (with a log entry including context) or rethrows with `cause`. No empty catch.
 - Integrations return `Result<T, IntegrationError>`; sync jobs throw to let pg-boss retry.
 - Unhandled rejections / uncaught exceptions → log fatal, exit (Docker restarts the container).
@@ -209,7 +209,7 @@ Visible iff event finished AND (event not followed OR spoiler off for sport OR w
 | `@types/node` | core-config, backend (dev) | Node typings for tooling and the backend only (never in runtime `core-*`) |
 | `@testcontainers/postgresql` | backend (dev) | integration tests against real PostgreSQL |
 | `zod` | core-schemas, backend, web | boundary validation, type derivation |
-| `fastify`, `@fastify/type-provider-zod` | backend | HTTP server, schema-validated routes |
+| `fastify`, `@fastify/type-provider-zod` | backend | HTTP server, schema-validated routes. The provider declares `@fastify/swagger` and `openapi-types` as required peers (type-only use), so pnpm installs them too; accepted — both are small and from the fastify org |
 | `@fastify/cookie` | backend | session cookie parsing/setting |
 | `@fastify/rate-limit` | backend | rate limits on auth, webhook, iCal |
 | `drizzle-orm`, `drizzle-kit` (dev), `pg` | backend | query layer, migrations, driver (ADR 0003) |
