@@ -35,10 +35,10 @@ packages/core-api-client typed fetch client over core-schemas
 | Lint / format | `pnpm lint` / `pnpm format` (check only: `pnpm format:check`) |
 | Unit tests | `pnpm test` (single package: `pnpm --filter @projectu/<pkg> test`) |
 | Integration tests | `pnpm test:integration` (needs Docker) — P0-04b |
-| Backend CLI | `node src/cli.ts <command>` in `apps/backend` (in production: `docker compose run --rm backend node src/cli.ts <command>`) — P0-04a |
-| DB generate migration | `pnpm --filter @projectu/backend db:generate` — P0-04a |
-| DB migrate | `pnpm --filter @projectu/backend db:migrate` — P0-04a |
-| Local Postgres | `docker compose -f compose.dev.yaml up -d postgres` — P0-04a |
+| Backend CLI | `node src/cli.ts <command>` in `apps/backend` (in production: `docker compose run --rm backend node src/cli.ts <command>`); commands so far: `db:migrate` |
+| DB generate migration | `pnpm --filter @projectu/backend db:generate` |
+| DB migrate | `pnpm --filter @projectu/backend db:migrate` |
+| Local Postgres | `docker compose -f compose.dev.yaml up -d --wait postgres` (Docker Desktop running) |
 
 ## Workflow rules
 1. Read `docs/PLAN.md` ("How to work this plan" + your subtask) before starting; work on **one subtask at a time** (by ID, e.g. `P2-01a`), only after its *Deps* are merged.

@@ -119,10 +119,11 @@ Test instructions always name the exact branch: before the PR is merged they sta
 - **Ctx:** ARCHITECTURE.md §9, SECURITY.md §6 (last line). **Deps:** P0-03b
 
 ### P0-04 Database & migrations
-#### [ ] P0-04a Drizzle setup & migration CLI
+#### [x] P0-04a Drizzle setup & migration CLI
 - **Files:** `apps/backend/src/db/{client.ts,schema/index.ts}`, `apps/backend/drizzle.config.ts`, `apps/backend/src/cli.ts` (`db:migrate`), `compose.dev.yaml`, `docs/decisions/0003-orm-drizzle.md`
 - **Do:** decide the Drizzle version per ADR 0003 and pin it in the ADR; `compose.dev.yaml` runs `postgres:18`; scripts `db:generate`, `db:migrate`.
 - **Done:** `docker compose -f compose.dev.yaml up -d postgres` + `pnpm --filter @projectu/backend db:migrate` work on an empty schema.
+- **Notes (done 2026-11-26):** Drizzle 1.0 still RC → `drizzle-orm` 0.45.4 / `drizzle-kit` 0.31.11 / `pg` 8.23.1 (ADR 0003). `DATABASE_URL` (postgres:// URL) is now required config. `db:migrate` = own CLI (`src/cli.ts`) with drizzle-orm's migrator: checks connectivity first (`select 1`), treats a missing/empty journal as "no migrations"; error output shows the cause chain (never the password). `compose.dev.yaml`: `postgres:18`, loopback-only port, password from `.env`, volume at `/var/lib/postgresql` (PG 18 layout). esbuild install script denied (`allowBuilds`). Verified against a real PostgreSQL 18.7 container: no-migrations run, a throwaway migration applied once (idempotent re-run), wrong password and unreachable server fail with exit 1. Automated DB tests start with P0-04b.
 - **Ctx:** ADR 0002, ADR 0003, DATA-MODEL.md "Conventions". **Deps:** P0-03c
 
 #### [ ] P0-04b Integration test harness
