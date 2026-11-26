@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import { buildApp } from './app.ts';
 import { formatConfigIssues, loadConfig } from './config.ts';
 import { createLoggerOptions } from './logger.ts';
 
@@ -9,6 +9,6 @@ if (!result.ok) {
 }
 const { config } = result;
 
-const app = Fastify({ logger: createLoggerOptions(config) });
+const app = buildApp({ logger: createLoggerOptions(config) });
 
 await app.listen({ host: config.backendHost, port: config.backendPort });

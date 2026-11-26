@@ -103,10 +103,11 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 - **Notes (done 2026-11-26):** `loadConfig(env)` returns a `ConfigResult` union; issues contain variable + rule only (never values); empty values count as missing. Variables so far: `NODE_ENV` (required), `LOG_LEVEL`, `BACKEND_HOST`, `BACKEND_PORT` (defaults) — later subtasks add theirs (`BACKEND_ROLES`/`TRUST_PROXY_CIDRS` in P0-03c, `DATABASE_URL` in P0-04a, …). `.env` loaded with Node's `--env-file-if-exists` in `dev` (no dotenv dependency); production env comes from Compose. Logger: pino `redact` paths + request serializer masking iCal path tokens and `token` query params (`maskUrl`). Backend now has a `test` script; `core-nettools` dependency dropped (wiring proof no longer needed).
 - **Ctx:** `.env.example`, SECURITY.md §2 (I2), §7. **Deps:** P0-01d
 
-#### [ ] P0-03b Errors & validation
+#### [x] P0-03b Errors & validation
 - **Files:** `apps/backend/src/{app.ts,errors.ts,plugins/error-handler.ts}`, tests
 - **Do:** `buildApp()` factory; `AppError` union + single error handler (`{ error: { code, message } }`, no stack traces); 404 shape; `@fastify/type-provider-zod` wired.
 - **Done:** `app.inject` tests for 404 shape, validation error shape, internal error hides details.
+- **Notes (done 2026-11-26):** `AppError` class carrying an `AppErrorDetail` union (`validation` with `issues`; other kinds with optional specific `code`, e.g. `last-passkey`), `statusForKind` with `assertNever`. Error handler also covers Zod request validation (dotted issue paths), response-schema violations (generic 500), and Fastify client errors (400 `bad-request`, 413, 415). `errorResponseSchema` / `validationIssueSchema` added to `core-schemas` (API contract). `buildApp({ logger })` factory; main uses it. Uses `@fastify/type-provider-zod` 1.0.3 (official fastify org package).
 - **Ctx:** ARCHITECTURE.md §8. **Deps:** P0-03a
 
 #### [ ] P0-03c Health, roles, proxy trust, shutdown
@@ -155,7 +156,7 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 
 #### [ ] P0-05d `core-schemas` base + `core-api-client`
 - **Files:** `packages/core-schemas/src/{common.ts,errors.ts,health.ts}`, `packages/core-api-client/src/**`
-- **Do:** error response schema, health schema, branded id helpers; client with typed `get/post/patch/delete`, zod-parsed responses, `ApiError` union, injectable auth strategy (cookie / bearer).
+- **Do:** health schema, branded id helpers (error response schema already exists since P0-03b); client with typed `get/post/patch/delete`, zod-parsed responses, `ApiError` union, injectable auth strategy (cookie / bearer).
 - **Done:** client tests with a fake `fetch` (success, API error, network error, schema mismatch).
 - **Ctx:** ARCHITECTURE.md §8, §10. **Deps:** P0-01c
 
@@ -168,7 +169,7 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 
 #### [ ] P0-06b Origin check, JSON-only, rate limits
 - **Files:** `apps/backend/src/plugins/{csrf-origin.ts,rate-limit.ts}`, tests
-- **Do:** non-GET requires `Origin == APP_ORIGIN` and `application/json`; rate limits per SECURITY.md §6.
+- **Do:** non-GET requires `Origin == APP_ORIGIN` and `application/json` (remove Fastify's default `text/plain` parser — today a `text/plain` body is parsed and only rejected by validation); rate limits per SECURITY.md §6.
 - **Done:** tests: foreign Origin → 403, form content type → 415, limit exceeded → 429.
 - **Ctx:** SECURITY.md §2 (T2), §6. **Deps:** P0-06a
 

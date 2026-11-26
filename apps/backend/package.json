@@ -11,6 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fastify/type-provider-zod": "1.0.3",
+    "@projectu/core-domain": "workspace:*",
+    "@projectu/core-schemas": "workspace:*",
     "fastify": "5.12.8",
     "zod": "4.6.7"
   },
