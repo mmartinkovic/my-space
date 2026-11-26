@@ -29,7 +29,7 @@ Rules:
 - Each package exposes one entry point (`exports: { ".": "./src/index.ts" }`); deep imports are forbidden (ESLint `no-restricted-imports`).
 - Exception: `core-config` is build tooling, not runtime code. It exposes subpaths (`/eslint`, `/vitest`, `/tsconfig/*.json`) because config files are referenced by path, and its own code and tests may use Node APIs.
 - Named exports only, kebab-case package names, scope `@projectu/*`.
-- Packages are consumed as TypeScript source (internal packages, no build step); apps compile them (`transpilePackages` in Next, `tsc`/bundle in backend — finalised in P0-01d).
+- Packages are consumed as TypeScript source (internal packages, no build step); apps consume them directly: Next.js via `transpilePackages`, the backend by running TypeScript natively on Node 26 (type stripping; decided in P0-01d, see ADR 0009).
 
 ## Deviations from the generic family template (justified)
 - **No `feature-*` / `platform-*` packages yet.** Web UI is React-DOM and cannot be reused by React Native, so extracting it into `feature-*` packages now adds ceremony with zero reuse. Web UI lives in `apps/web/src/features/<module>/` with the same folder discipline (`index.ts` boundary, `components/`, `hooks/`, `consts/`). When Expo arrives, shared hooks (TanStack Query hooks over `core-api-client`) move to `feature-*` packages and native-only code to `platform-*`.

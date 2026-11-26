@@ -15,6 +15,19 @@ The plan is split into **small, self-contained subtasks** (IDs like `P0-06c`) so
 - **(owner)** marks subtasks that need the owner's hands (accounts, server, iPhone). Agents prepare scripts and checklists; the owner executes and reports results, which are recorded under "Deployment records".
 - Field keys: **Files** = scope · **Do** = what to build · **Done** = acceptance + tests · **Ctx** = the only docs to read · **Deps** = subtasks merged first.
 
+## Test checkpoints (owner)
+At the end of each subtask below, the agent tells the owner exactly how to try it out.
+
+| After | What the owner can try | Where |
+|---|---|---|
+| P0-01d | `pnpm dev` → empty page on :3000, backend answers on :4000 (technical smoke test) | dev PC |
+| P0-07c | First real flow: setup + passkey login (Windows Hello) | dev PC, localhost |
+| P0-10d | First version on the iPhone: HTTPS on the own domain, Add to Home Screen, Face ID login | iPhone + server |
+| P1-01c, P1-03b | Test push notification; test message from the Telegram bot | iPhone |
+| P2-03b | First useful features: deadlines and inbox | iPhone |
+| P3-07c | Sports calendar, spoiler mode, iCal subscription | iPhone |
+| P4-04 | **MVP** — morning brief, daily use | iPhone |
+
 ## Milestones
 | Phase | Theme | Outcome |
 |---|---|---|
@@ -67,10 +80,11 @@ The plan is split into **small, self-contained subtasks** (IDs like `P0-06c`) so
 - **Notes (done 2026-11-26):** each package ships one small real export instead of a dummy: `localeSchema`/`Locale` (schemas, adds `zod`), `defaultLocale` (i18n, depends on schemas), `assertNever` (domain), `isIpv4Address` (nettools), `joinUrl` (api-client). `core-config` gained: `universal: true` option (forbids `node:*` imports and Node globals in runtime `core-*` code), a tooling tsconfig used by ESLint for root `*.config.*` files (Node types stay out of `src`), `no-undef` off (TypeScript reports it), and `.ts` extensions in relative imports (`allowImportingTsExtensions` + `rewriteRelativeImportExtensions`).
 - **Ctx:** ADR 0001. **Deps:** P0-01b
 
-#### [ ] P0-01d App skeletons + confirmed commands
+#### [x] P0-01d App skeletons + confirmed commands
 - **Files:** `apps/backend/{package.json,tsconfig.json,src/main.ts}`, `apps/web/**` (minimal Next.js 16 App Router page, `next.config.ts` with `transpilePackages`, `output: 'standalone'`), `CLAUDE.md` (Commands section), `README.md` (Local development)
-- **Do:** backend dev via `tsx watch`, build via `tsc`; web imports one symbol from a core package to prove wiring.
+- **Do:** backend runs TypeScript natively on Node 26 (`node --watch src/main.ts`, no build step); web imports one symbol from a core package to prove wiring.
 - **Done:** `pnpm dev`, `pnpm build`, `pnpm typecheck`, `pnpm lint`, `pnpm test` work; CLAUDE.md commands table marked confirmed.
+- **Notes (done 2026-11-26):** backend = minimal Fastify bootstrap (no routes yet; P0-03 adds config, errors, health), imports `isIpv4Address` to prove wiring; no `tsx` — Node 26 type stripping runs `src/*.ts` and workspace sources directly (ADR 0009), `erasableSyntaxOnly` added to the base tsconfig. Web = Next.js 16.4.6 / React 19.3.1, `<html lang>` from `core-i18n`, `next-env.d.ts` git-ignored, `typecheck` runs `next typegen` first. Apps get `test` scripts with their first tests (P0-03a, P0-07a). Verified: `pnpm dev` serves both apps, `pnpm build` builds the web app. CLI paths in docs changed from `node dist/cli.js` to `node src/cli.ts`. Dev servers bind to `127.0.0.1` (backend via new `BACKEND_HOST`, default `127.0.0.1`; the container sets `0.0.0.0`) — P0-03a moves it into the zod config.
 - **Ctx:** ADR 0001, ADR 0009, README "Local development". **Deps:** P0-01c
 
 ### P0-02 CI and dependency hygiene

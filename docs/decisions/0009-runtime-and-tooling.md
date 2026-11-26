@@ -17,6 +17,8 @@
 | Testcontainers (`@testcontainers/postgresql`) | latest | real PostgreSQL in integration tests instead of mocks |
 | ESLint + typescript-eslint, Prettier | latest | lint/format |
 
+**Backend execution (P0-01d):** the backend runs its `.ts` sources (and the `core-*` sources it imports) directly with Node 26's built-in type stripping — `node src/main.ts`, `node --watch` for dev. No `tsx`, no bundler, no `dist/`. Constraints, enforced by the shared tsconfig: `erasableSyntaxOnly` (no enums, namespaces, parameter properties), `verbatimModuleSyntax`, relative imports with `.ts` extensions. `tsc` is used for typechecking only. Fallback if this ever breaks: bundle with esbuild in the Dockerfile.
+
 Node is installed without corepack assumptions (corepack is no longer bundled with recent Node); CI and Dockerfiles install pnpm explicitly at the pinned version.
 
 ## Consequences

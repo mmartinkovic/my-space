@@ -24,19 +24,21 @@ packages/core-api-client typed fetch client over core-schemas
 - Runtime `core-*` packages lint with `createEslintConfig({ rootDir, universal: true })`, which blocks Node imports and globals.
 - Only `apps/backend` touches the database or keyed external APIs. Business rules live in `core-domain`, not in route handlers or React components.
 
-## Commands *(to be confirmed in P0-01d — update this section then)*
+## Commands *(confirmed in P0-01d; rows marked with a task ID exist from that task on)*
 | Task | Command |
 |---|---|
-| Install | `pnpm install` |
-| Dev (all) | `pnpm dev` |
-| Build | `pnpm build` |
+| Install | `pnpm install` (CI: `pnpm install --frozen-lockfile`) |
+| Dev (all) | `pnpm dev` — web http://localhost:3000, backend http://localhost:4000 |
+| Dev (one app) | `pnpm --filter @projectu/web dev` / `pnpm --filter @projectu/backend dev` |
+| Build | `pnpm build` (web only — the backend runs TypeScript directly on Node 26, no build step) |
 | Typecheck | `pnpm typecheck` |
-| Lint / format | `pnpm lint` / `pnpm format` |
+| Lint / format | `pnpm lint` / `pnpm format` (check only: `pnpm format:check`) |
 | Unit tests | `pnpm test` (single package: `pnpm --filter @projectu/<pkg> test`) |
-| Integration tests | `pnpm test:integration` (needs Docker) |
-| DB generate migration | `pnpm --filter @projectu/backend db:generate` |
-| DB migrate | `pnpm --filter @projectu/backend db:migrate` |
-| Local Postgres | `docker compose -f compose.dev.yaml up -d postgres` |
+| Integration tests | `pnpm test:integration` (needs Docker) — P0-04b |
+| Backend CLI | `node src/cli.ts <command>` in `apps/backend` (in production: `docker compose run --rm backend node src/cli.ts <command>`) — P0-04a |
+| DB generate migration | `pnpm --filter @projectu/backend db:generate` — P0-04a |
+| DB migrate | `pnpm --filter @projectu/backend db:migrate` — P0-04a |
+| Local Postgres | `docker compose -f compose.dev.yaml up -d postgres` — P0-04a |
 
 ## Workflow rules
 1. Read `docs/PLAN.md` ("How to work this plan" + your subtask) before starting; work on **one subtask at a time** (by ID, e.g. `P2-01a`), only after its *Deps* are merged.

@@ -77,14 +77,14 @@ cd /opt/projectu && ./ops/deploy.sh [tag]   # default: main
 ```
 `deploy.sh` steps:
 1. `docker compose pull web backend`
-2. `docker compose run --rm backend node dist/cli.js db:migrate` (forward-only migrations; abort on failure)
+2. `docker compose run --rm backend node src/cli.ts db:migrate` (forward-only migrations; abort on failure)
 3. `docker compose up -d --remove-orphans`
 4. Wait for `backend` healthcheck healthy (timeout 90 s) → print status; on failure print last 100 log lines and exit non-zero.
 Rollback: `./ops/deploy.sh sha-<previous>` (only safe if the migration was backward compatible — migrations follow expand/contract: never drop/rename a column in the same release that stops using it).
 
 Post-first-deploy one-offs:
-- `docker compose run --rm backend node dist/cli.js telegram:set-webhook` (registers `https://<APP_DOMAIN>/api/telegram/webhook` with `secret_token`, `allowed_updates`, `setMyCommands`).
-- `docker compose run --rm backend node dist/cli.js vapid:generate` (prints keys to put into `.env`; run once).
+- `docker compose run --rm backend node src/cli.ts telegram:set-webhook` (registers `https://<APP_DOMAIN>/api/telegram/webhook` with `secret_token`, `allowed_updates`, `setMyCommands`).
+- `docker compose run --rm backend node src/cli.ts vapid:generate` (prints keys to put into `.env`; run once).
 - Open `https://<APP_DOMAIN>/setup`, register the first passkey with `SETUP_TOKEN`, store recovery codes, remove `SETUP_TOKEN` from `.env`, `docker compose up -d backend`.
 
 ## 7. Backups
