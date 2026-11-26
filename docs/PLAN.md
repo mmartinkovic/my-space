@@ -110,10 +110,11 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 - **Notes (done 2026-11-26):** `AppError` class carrying an `AppErrorDetail` union (`validation` with `issues`; other kinds with optional specific `code`, e.g. `last-passkey`), `statusForKind` with `assertNever`. Error handler also covers Zod request validation (dotted issue paths), response-schema violations (generic 500), and Fastify client errors (400 `bad-request`, 413, 415). `errorResponseSchema` / `validationIssueSchema` added to `core-schemas` (API contract). `buildApp({ logger })` factory; main uses it. Uses `@fastify/type-provider-zod` 1.0.3 (official fastify org package).
 - **Ctx:** ARCHITECTURE.md §8. **Deps:** P0-03a
 
-#### [ ] P0-03c Health, roles, proxy trust, shutdown
+#### [x] P0-03c Health, roles, proxy trust, shutdown
 - **Files:** `apps/backend/src/{modules/system/health.routes.ts,roles.ts,main.ts}`, tests
 - **Do:** `GET /api/health/live`, `/api/health/ready` (checks registered dependencies; DB added in P0-04b); `trustProxy` limited to `TRUST_PROXY_CIDRS`; `BACKEND_ROLES` toggles api/worker; `SIGTERM` closes server, pg-boss and pool within 10 s.
 - **Done:** inject tests for both health routes; unit test of role parsing.
+- **Notes (done 2026-11-26):** readiness = list of `ReadinessCheck { name, isReady }` passed to `buildApp`, each limited to 2 s; failures/timeouts → 503 `{ status: 'not-ready' }`, failing names only in the log. Response schemas `livenessResponseSchema` / `readinessResponseSchema` added to `core-schemas`. Config gained `BACKEND_ROLES` (default `api,worker`, deduplicated) and `TRUST_PROXY_CIDRS` (CIDR list, empty = trust none → `trustProxy: false`). The HTTP server runs in every role (health serves the container healthcheck); the role switch gets something to toggle with the first API module (P0-06a) and the worker (P0-09a). Graceful shutdown in `shutdown.ts` (SIGTERM/SIGINT, 10 s hard limit, repeated signals ignored); pg-boss and the DB pool close via Fastify `onClose` hooks when they arrive.
 - **Ctx:** ARCHITECTURE.md §9, SECURITY.md §6 (last line). **Deps:** P0-03b
 
 ### P0-04 Database & migrations
@@ -156,7 +157,7 @@ At the end of each subtask below, the agent tells the owner exactly how to try i
 
 #### [ ] P0-05d `core-schemas` base + `core-api-client`
 - **Files:** `packages/core-schemas/src/{common.ts,errors.ts,health.ts}`, `packages/core-api-client/src/**`
-- **Do:** health schema, branded id helpers (error response schema already exists since P0-03b); client with typed `get/post/patch/delete`, zod-parsed responses, `ApiError` union, injectable auth strategy (cookie / bearer).
+- **Do:** branded id helpers (error and health response schemas already exist since P0-03b/P0-03c); client with typed `get/post/patch/delete`, zod-parsed responses, `ApiError` union, injectable auth strategy (cookie / bearer).
 - **Done:** client tests with a fake `fetch` (success, API error, network error, schema mismatch).
 - **Ctx:** ARCHITECTURE.md §8, §10. **Deps:** P0-01c
 

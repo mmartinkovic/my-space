@@ -8,7 +8,7 @@ const internalSecret = 'db-password=hunter2';
 
 /** App with throwaway routes that exercise each error path. */
 const createTestApp = () => {
-  const app = buildApp({ logger: false });
+  const app = buildApp({ logger: false, trustProxyCidrs: [], readinessChecks: [] });
 
   app.get(
     '/items',

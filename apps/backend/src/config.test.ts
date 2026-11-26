@@ -12,6 +12,8 @@ describe('loadConfig', () => {
         logLevel: 'info',
         backendHost: '127.0.0.1',
         backendPort: 4000,
+        backendRoles: ['api', 'worker'],
+        trustProxyCidrs: [],
       },
     });
   });
@@ -23,6 +25,8 @@ describe('loadConfig', () => {
         LOG_LEVEL: 'warn',
         BACKEND_HOST: '0.0.0.0',
         BACKEND_PORT: '4100',
+        BACKEND_ROLES: 'worker',
+        TRUST_PROXY_CIDRS: '172.18.0.0/16',
       }),
     ).toEqual({
       ok: true,
@@ -31,6 +35,8 @@ describe('loadConfig', () => {
         logLevel: 'warn',
         backendHost: '0.0.0.0',
         backendPort: 4100,
+        backendRoles: ['worker'],
+        trustProxyCidrs: ['172.18.0.0/16'],
       },
     });
   });
@@ -59,6 +65,21 @@ describe('loadConfig', () => {
       { ...validEnv, BACKEND_PORT: '70000' },
       'BACKEND_PORT',
       'must be an integer between 1 and 65535',
+    ],
+    [
+      { ...validEnv, BACKEND_ROLES: 'api,scheduler' },
+      'BACKEND_ROLES',
+      'must be a comma-separated list of: api, worker',
+    ],
+    [
+      { ...validEnv, BACKEND_ROLES: ' , ' },
+      'BACKEND_ROLES',
+      'must be a comma-separated list of: api, worker',
+    ],
+    [
+      { ...validEnv, TRUST_PROXY_CIDRS: '172.18.0.0/16,caddy,10.0.0.1' },
+      'TRUST_PROXY_CIDRS',
+      'must be a comma-separated list of CIDRs, e.g. 172.18.0.0/16 (empty = none)',
     ],
   ])('%j → %s %s', (env, variable, message) => {
     expect(loadConfig(env)).toEqual({ ok: false, issues: [{ variable, message }] });
