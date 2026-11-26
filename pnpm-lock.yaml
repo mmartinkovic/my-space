@@ -29,12 +29,12 @@ importers:
 
   apps/backend:
     dependencies:
-      '@projectu/core-nettools':
-        specifier: workspace:*
-        version: link:../../packages/core-nettools
       fastify:
         specifier: 5.12.8
         version: 5.12.8
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
     devDependencies:
       '@projectu/core-config':
         specifier: workspace:*

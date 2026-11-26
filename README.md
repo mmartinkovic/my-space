@@ -38,11 +38,13 @@ ops/                deploy, backup and restore scripts (Phase 0)
 Prerequisites: Node.js 26.1+ (see `.nvmrc`), pnpm 11 (`npm i -g pnpm@11`), Docker (for PostgreSQL and integration tests, from P0-04).
 ```bash
 pnpm install
+cp .env.example .env          # set NODE_ENV=development; the backend reads it via `node --env-file-if-exists`
 pnpm dev                      # web on http://localhost:3000, backend on http://localhost:4000
 ```
+The backend validates its environment at startup and exits with a list of missing/invalid variables (names and rules only, never values). Variables are added to `apps/backend/src/config.ts` by the subtask that first uses them.
+
 From P0-04 on (database):
 ```bash
-cp .env.example .env          # fill in values; NODE_ENV=development
 docker compose -f compose.dev.yaml up -d postgres
 pnpm --filter @projectu/backend db:migrate
 ```
