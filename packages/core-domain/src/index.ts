@@ -1,3 +1,5 @@
+export { isInQuietHours, nextQuietHoursEnd } from './quiet-hours/quiet-hours.ts';
+export type { QuietHours, QuietHoursQuery } from './quiet-hours/quiet-hours.ts';
 export { startOfLocalDay, startOfLocalMonth, toUtcInstant } from './time/zone.ts';
 export type { LocalDateTime, ZonedInstant } from './time/zone.ts';
 

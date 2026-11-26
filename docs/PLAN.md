@@ -154,10 +154,11 @@ Test instructions always name the exact branch: before the PR is merged they sta
 - **Done:** DST tests (2027-03-28, 2027-10-31 and current-year equivalents); non-existent/ambiguous local times documented and tested.
 - **Ctx:** ADR 0011. **Deps:** P0-01c
 
-#### [ ] P0-05c `core-domain/quiet-hours`
+#### [x] P0-05c `core-domain/quiet-hours`
 - **Files:** `packages/core-domain/src/quiet-hours/**`
 - **Do:** `isInQuietHours`, `nextQuietHoursEnd` with explicit `now` and zone; windows wrapping midnight.
 - **Done:** table-driven tests incl. DST nights and midnight wrap.
+- **Notes (done 2026-11-26):** both take `{ now, zone, quietHours: { start, end } }`; times are `HH:mm` or `HH:mm:ss` (the shape of PostgreSQL `time`). `nextQuietHoursEnd` is the next wall-clock occurrence of `end` after `now`, so callers check `isInQuietHours` first. `localDateOf` and the new `addLocalDays` are shared from `time/zone.ts` (not part of the package API). Boundary and DST choices are in features/notifications.md "Assumptions".
 - **Ctx:** features/notifications.md "Rules". **Deps:** P0-05b
 
 #### [ ] P0-05d `core-schemas` base + `core-api-client`
