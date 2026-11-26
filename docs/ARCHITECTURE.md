@@ -216,7 +216,7 @@ Visible iff event finished AND (event not followed OR spoiler off for sport OR w
 | `pg-boss` | backend | jobs (ADR 0004) |
 | `@simplewebauthn/server` / `@simplewebauthn/browser` | backend / web | WebAuthn ceremonies (ADR 0005) |
 | `web-push` | backend | VAPID + payload encryption (ADR 0006) |
-| `date-fns`, `@date-fns/tz` | core-domain | DST-safe zone math (ADR 0011) |
+| `@date-fns/tz` | core-domain | zone offsets from the runtime's `Intl` data for DST-safe zone math (ADR 0011) |
 | `next`, `react`, `react-dom` | web | UI framework (given) |
 | `@tanstack/react-query` | web | server-state caching, retries, focus refetch; portable to Expo |
 | `tailwindcss` (dev) | web | styling without a component library |
