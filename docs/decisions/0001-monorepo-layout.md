@@ -27,6 +27,7 @@ apps/*  →  feature-*  →  platform-*  →  core-*
 Rules:
 - `core-*` packages are platform-agnostic: no DOM, no Node-only APIs (`node:*`), no React. They run in browser, Node and React Native.
 - Each package exposes one entry point (`exports: { ".": "./src/index.ts" }`); deep imports are forbidden (ESLint `no-restricted-imports`).
+- Exception: `core-config` is build tooling, not runtime code. It exposes subpaths (`/eslint`, `/vitest`, `/tsconfig/*.json`) because config files are referenced by path, and its own code and tests may use Node APIs.
 - Named exports only, kebab-case package names, scope `@projectu/*`.
 - Packages are consumed as TypeScript source (internal packages, no build step); apps compile them (`transpilePackages` in Next, `tsc`/bundle in backend — finalised in P0-01d).
 

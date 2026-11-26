@@ -203,8 +203,10 @@ Visible iff event finished AND (event not followed OR spoiler off for sport OR w
 | Package | Where | Reason |
 |---|---|---|
 | `turbo` | root (dev) | task orchestration + caching |
-| `typescript`, `eslint`, `typescript-eslint`, `prettier` | root (dev) | typecheck, lint, format |
-| `vitest` | root (dev) | tests |
+| `typescript`, `eslint`, `prettier`, `turbo` | root (dev) | typecheck, lint, format |
+| `vitest`, `vite` | root (dev) | tests (`vite` is a required peer of Vitest 5) |
+| `@eslint/js`, `typescript-eslint` | core-config | shared flat ESLint config (recommended + `strictTypeChecked`) |
+| `@types/node` | core-config, backend (dev) | Node typings for tooling and the backend only (never in runtime `core-*`) |
 | `@testcontainers/postgresql` | backend (dev) | integration tests against real PostgreSQL |
 | `zod` | core-schemas, backend, web | boundary validation, type derivation |
 | `fastify`, `@fastify/type-provider-zod` | backend | HTTP server, schema-validated routes |

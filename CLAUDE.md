@@ -45,7 +45,7 @@ packages/core-api-client typed fetch client over core-schemas
 5. After each change run typecheck, lint and tests; fix failures before moving on.
 6. Update the task checkbox in `docs/PLAN.md` (`[~]` in progress, `[x]` done) and any docs whose facts changed.
 7. Small, focused changes. Don't touch unrelated code. Don't reformat files you aren't changing.
-8. No new dependency without a written reason (add it to ARCHITECTURE.md §11). Prefer platform APIs (`fetch`, `Intl`, WebCrypto).
+8. No new dependency without a written reason (add it to ARCHITECTURE.md §11). Prefer platform APIs (`fetch`, `Intl`, WebCrypto). Pin exact versions that are older than pnpm's minimum release age; never add `minimumReleaseAgeExclude` entries (supply-chain guard) — pick the previous release instead.
 9. Definition of done: typecheck + lint + tests green, acceptance criteria met, **no placeholders, no TODOs, no commented-out code**.
 10. Conventional Commits (`feat(budget): add monthly limit status`), one logical change per commit. One branch + PR per subtask: `feat/<id>-<slug>` (e.g. `feat/p0-03a-config-logger`). Commit only when the user asks.
 11. Never put personal data in the repository (real locations, domain, e-mail, names): it is public. Such values live in `.env` or in app settings.
