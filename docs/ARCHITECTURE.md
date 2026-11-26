@@ -207,7 +207,7 @@ Visible iff event finished AND (event not followed OR spoiler off for sport OR w
 | `vitest`, `vite` | root (dev) | tests (`vite` is a required peer of Vitest 5) |
 | `@eslint/js`, `typescript-eslint` | core-config | shared flat ESLint config (recommended + `strictTypeChecked`) |
 | `@types/node` | core-config, backend (dev) | Node typings for tooling and the backend only (never in runtime `core-*`) |
-| `@testcontainers/postgresql` | backend (dev) | integration tests against real PostgreSQL |
+| `@testcontainers/postgresql` | backend (dev) | integration tests against real PostgreSQL (one container per run, one database per test file). Its optional native install scripts (`cpu-features`, `ssh2`, `protobufjs`) are denied in `pnpm-workspace.yaml` |
 | `zod` | core-schemas, backend, web | boundary validation, type derivation |
 | `fastify`, `@fastify/type-provider-zod` | backend | HTTP server, schema-validated routes. The provider declares `@fastify/swagger` and `openapi-types` as required peers (type-only use), so pnpm installs them too; accepted — both are small and from the fastify org |
 | `@fastify/cookie` | backend | session cookie parsing/setting |

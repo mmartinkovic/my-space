@@ -126,16 +126,17 @@ Test instructions always name the exact branch: before the PR is merged they sta
 - **Notes (done 2026-11-26):** Drizzle 1.0 still RC → `drizzle-orm` 0.45.4 / `drizzle-kit` 0.31.11 / `pg` 8.23.1 (ADR 0003). `DATABASE_URL` (postgres:// URL) is now required config. `db:migrate` = own CLI (`src/cli.ts`) with drizzle-orm's migrator: checks connectivity first (`select 1`), treats a missing/empty journal as "no migrations"; error output shows the cause chain (never the password). `compose.dev.yaml`: `postgres:18`, loopback-only port, password from `.env`, volume at `/var/lib/postgresql` (PG 18 layout). esbuild install script denied (`allowBuilds`). Verified against a real PostgreSQL 18.7 container: no-migrations run, a throwaway migration applied once (idempotent re-run), wrong password and unreachable server fail with exit 1. Automated DB tests start with P0-04b.
 - **Ctx:** ADR 0002, ADR 0003, DATA-MODEL.md "Conventions". **Deps:** P0-03c
 
-#### [ ] P0-04b Integration test harness
+#### [x] P0-04b Integration test harness
 - **Files:** `apps/backend/test/{db.ts,setup-integration.ts}`, `apps/backend/vitest.integration.config.ts`, readiness DB check, `.github/workflows/ci.yml` (add `pnpm test:integration` step)
 - **Do:** Testcontainers helper: fresh PostgreSQL per test file with migrations applied; `test:integration` script; `/api/health/ready` checks the DB.
 - **Done:** integration test: ready → 200 with DB, 503 when the DB is unreachable.
+- **Notes (done 2026-11-26):** one `postgres:18` container per run (`test/setup-integration.ts`, Vitest `globalSetup` + `provide`/`inject`), and per test file a fresh migrated database via `createTestDatabase()` / `drop()` in `test/db.ts` — same isolation as a container per file, much faster. Integration tests are named `*.int.test.ts` (excluded from `pnpm test`). `databaseReadinessCheck(pool)` wired in `main.ts`; the pool closes in an `onClose` hook and idle-client errors are logged (`onPoolError`, otherwise pg's `error` event would crash the process). CI runs `pnpm test:integration`. Testcontainers' optional native build scripts (`cpu-features`, `ssh2`, `protobufjs`) are denied via `allowBuilds`. Verified manually: dev DB up → ready 200, stopped → 503 with `failing: ["database"]` in the log.
 - **Ctx:** CLAUDE.md "Testing". **Deps:** P0-04a
 
 #### [ ] P0-04c First migration: enums, settings, auth tables
 - **Files:** `apps/backend/src/db/schema/{enums.ts,settings.ts,auth.ts}`, generated migration, tests
 - **Do:** enums needed so far, `app_settings` (seeded singleton), `webauthn_credential`, `recovery_code`, `webauthn_challenge`, `session`, `auth_event`.
-- **Done:** integration tests: CHECK constraints reject invalid rows (e.g. `app_settings.id = 2`, session `expires_at < created_at`).
+- **Done:** integration tests (`*.int.test.ts` with `createTestDatabase()`): CHECK constraints reject invalid rows (e.g. `app_settings.id = 2`, session `expires_at < created_at`).
 - **Ctx:** DATA-MODEL.md "Conventions", "Enums", "Settings & auth". **Deps:** P0-04b
 
 ### P0-05 Shared foundations

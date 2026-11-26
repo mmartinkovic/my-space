@@ -9,6 +9,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --env-file-if-exists=../../.env src/cli.ts db:migrate"
   },
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@projectu/core-config": "workspace:*",
+    "@testcontainers/postgresql": "12.2.2",
     "@types/node": "26.6.10",
     "@types/pg": "8.23.1",
     "drizzle-kit": "0.31.11"
