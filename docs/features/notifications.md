@@ -29,6 +29,11 @@ All of the above editable in Settings → Notifications (type × channel matrix,
 - Push subscription UI: shown only when `display-mode: standalone` on iOS (otherwise explains "Add to Home Screen first"); permission requested only on button tap.
 - Test button per channel ("Send test notification").
 
+## Assumptions
+- A quiet hours window includes its start and excludes its end: with 22:00–07:00, 22:00 is quiet and 07:00 is not.
+- Equal start and end mean an empty window (quiet hours off), not a 24-hour one.
+- DST follows [ADR 0011](../decisions/0011-time-handling.md): a skipped boundary moves forward by the gap, a repeated one counts at its first occurrence only. A window lying entirely in the skipped hour does not occur that night.
+
 ## Edge cases
 - Event time changes after planning → pending notification rescheduled; already-sent kickoff notification is not resent.
 - Event cancelled/postponed → pending notifications cancelled; optional Telegram info message "Match postponed".

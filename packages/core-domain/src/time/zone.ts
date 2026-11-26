@@ -65,10 +65,17 @@ export const toUtcInstant = (input: LocalDateTime): Date => {
   return new Date(occurrences.length > 0 ? Math.min(...occurrences) : wallClock - offsetBefore);
 };
 
-const localDateOf = ({ instant, zone }: ZonedInstant): string => {
+/** The zone's calendar date (`YYYY-MM-DD`) at the instant. */
+export const localDateOf = ({ instant, zone }: ZonedInstant): string => {
   const epochMs = instant.getTime();
   return new Date(epochMs + offsetAt(zone, epochMs)).toISOString().slice(0, 10);
 };
+
+/** Calendar arithmetic on a `YYYY-MM-DD` date; no zone is involved. */
+export const addLocalDays = (localDate: string, days: number): string =>
+  new Date(Date.parse(`${localDate}T00:00:00Z`) + days * millisecondsPerDay)
+    .toISOString()
+    .slice(0, 10);
 
 /**
  * First instant of the zone's calendar day containing `instant`. Where DST skips midnight,
