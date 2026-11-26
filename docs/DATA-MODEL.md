@@ -14,6 +14,8 @@ PostgreSQL 18, Drizzle schema in `apps/backend/src/db/schema/*.ts`. This documen
 - `created_at timestamptz NOT NULL DEFAULT now()`; `updated_at` where rows are edited (set by the repository layer).
 
 ## Enums
+Created by the migration of the first table that uses them. When an enum becomes part of the API contract, its values move to a zod enum in `core-schemas` and `pgEnum` is derived from it (as `locale` is).
+
 | Enum | Values |
 |---|---|
 | `locale` | `sk`, `en` |
@@ -54,7 +56,7 @@ PostgreSQL 18, Drizzle schema in `apps/backend/src/db/schema/*.ts`. This documen
 | `deadline_reminder_time` | `time` | default `08:00` |
 | `spoiler_auto_reveal_hours` | `smallint` | default `24`, `CHECK (> 0 AND <= 720)` |
 | `big_match_extra_top_count` | `smallint` | default `4`, `CHECK (0..10)` |
-| `webauthn_user_handle` | `bytea` | 32 random bytes, generated at setup |
+| `webauthn_user_handle` | `bytea NULL` | 32 random bytes, generated at setup; NULL = setup not completed |
 | `updated_at` | `timestamptz` | |
 
 ### `webauthn_credential`
@@ -78,7 +80,7 @@ Index: partial `(batch_id) WHERE used_at IS NULL`. Regeneration deletes all rows
 
 ### `webauthn_challenge`
 `id` uuid PK · `kind challenge_kind` · `challenge bytea` · `session_id uuid NULL` (FK `session` ON DELETE CASCADE; set for step-up/recovery registrations) · `expires_at` (now + 5 min) · `created_at`.
-Index `(expires_at)` for cleanup. Consumed (deleted) on verification attempt, success or failure.
+Indexes `(expires_at)` for cleanup and `(session_id)` (FK). Consumed (deleted) on verification attempt, success or failure.
 
 ### `session`
 | Column | Type | Notes |
@@ -88,7 +90,7 @@ Index `(expires_at)` for cleanup. Consumed (deleted) on verification attempt, su
 | `scope` | `session_scope` | `recovery` sessions may only register a passkey |
 | `client_kind` | `client_kind` | default `web` |
 | `created_at`, `last_seen_at` | `timestamptz` | |
-| `expires_at` | `timestamptz` | `CHECK (expires_at > created_at)`; recovery scope max 15 min |
+| `expires_at` | `timestamptz` | `CHECK (expires_at > created_at)`; recovery scope max 15 min (`CHECK`, so set `created_at` and `expires_at` from the same clock) |
 | `elevated_until` | `timestamptz NULL` | NULL = no step-up |
 | `user_agent` | `text` | truncated 300 chars |
 | `ip` | `inet` | |
@@ -101,6 +103,10 @@ Index `(expires_at)`.
 ### `ical_feed_token`
 `id` uuid PK · `feed ical_feed` · `token_hash bytea UNIQUE` · `created_at` · `revoked_at timestamptz NULL` (NULL = active) · `last_accessed_at timestamptz NULL`.
 Partial unique index `(feed) WHERE revoked_at IS NULL` → exactly one active token per feed. Rotation = revoke + insert in one transaction.
+
+### Assumptions (P0-04c, 2026-11-26)
+- `webauthn_user_handle` is nullable because the settings row is seeded by a migration, before the setup flow generates the handle.
+- The 15-minute limit of recovery sessions is enforced by a `CHECK` in the database, not only by the service.
 
 ---
 

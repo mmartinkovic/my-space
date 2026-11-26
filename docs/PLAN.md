@@ -133,10 +133,11 @@ Test instructions always name the exact branch: before the PR is merged they sta
 - **Notes (done 2026-11-26):** one `postgres:18` container per run (`test/setup-integration.ts`, Vitest `globalSetup` + `provide`/`inject`), and per test file a fresh migrated database via `createTestDatabase()` / `drop()` in `test/db.ts` — same isolation as a container per file, much faster. Integration tests are named `*.int.test.ts` (excluded from `pnpm test`). `databaseReadinessCheck(pool)` wired in `main.ts`; the pool closes in an `onClose` hook and idle-client errors are logged (`onPoolError`, otherwise pg's `error` event would crash the process). CI runs `pnpm test:integration`. Testcontainers' optional native build scripts (`cpu-features`, `ssh2`, `protobufjs`) are denied via `allowBuilds`. Verified manually: dev DB up → ready 200, stopped → 503 with `failing: ["database"]` in the log.
 - **Ctx:** CLAUDE.md "Testing". **Deps:** P0-04a
 
-#### [ ] P0-04c First migration: enums, settings, auth tables
+#### [x] P0-04c First migration: enums, settings, auth tables
 - **Files:** `apps/backend/src/db/schema/{enums.ts,settings.ts,auth.ts}`, generated migration, tests
 - **Do:** enums needed so far, `app_settings` (seeded singleton), `webauthn_credential`, `recovery_code`, `webauthn_challenge`, `session`, `auth_event`.
 - **Done:** integration tests (`*.int.test.ts` with `createTestDatabase()`): CHECK constraints reject invalid rows (e.g. `app_settings.id = 2`, session `expires_at < created_at`).
+- **Notes (done 2026-11-26):** shared column helpers in `schema/columns.ts` (`bytea` custom type — Drizzle 0.45 has none; `uuidv7()` primary key). Two migrations: generated DDL `0000_settings_and_auth` and the custom `0001_seed_app_settings` (`db:generate --custom`). Name UNIQUE constraints explicitly (Drizzle's automatic names keep the camelCase key despite `casing`). Tests assert constraint names via `expectViolation` (`test/violations.ts`). drizzle-kit output is excluded from Prettier. Assumptions recorded in DATA-MODEL.md "Settings & auth". The 1–30 range of reminder offsets is validated by zod when the settings API arrives.
 - **Ctx:** DATA-MODEL.md "Conventions", "Enums", "Settings & auth". **Deps:** P0-04b
 
 ### P0-05 Shared foundations

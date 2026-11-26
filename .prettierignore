@@ -6,5 +6,7 @@ build/
 out/
 .turbo/
 coverage/
+# Written by drizzle-kit
+apps/backend/src/db/migrations/
 # Hand-formatted docs (tables); not reformatted by tooling
 *.md
